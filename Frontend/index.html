@@ -169,7 +169,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <input type="text" id="username-input" class="form-control" placeholder="Enter username or company ID"
+              <input type="text" id="username-input" class="form-control" value="temenos_admin" placeholder="Enter username or company ID"
                 value="tatasteel_admin" required>
             </div>
           </div>
@@ -181,7 +181,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              <input type="password" id="password-input" class="form-control" placeholder="Enter password"
+              <input type="password" id="password-input" class="form-control" value="temenos@nidhi2026" placeholder="Enter password"
                 value="••••••••••••" required>
               <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password-input')">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,7 +195,9 @@
             <a href="#" class="forgot-password-link">Forgot password?</a>
           </div>
 
-          <button type="submit" class="btn-navy">
+          <div id="login-error" class="login-error" style="display:none;"></div>
+
+          <button type="submit" class="btn-navy" id="login-submit-btn">
             Login &rarr;
           </button>
         </form>
@@ -469,6 +471,13 @@
             </a>
           </li>
           <li>
+            <a href="#" class="sidebar-menu-item" data-view="ws-analysis">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span>AI Analysis</span>
+            </a>
             <a href="#" class="sidebar-menu-item" data-view="ws-saved">
               <svg fill="none" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -483,8 +492,8 @@
       <div class="sidebar-bottom">
         <div class="user-profile-pill">
           <div class="user-profile-info">
-            <div class="user-avatar" id="user-avatar-badge">TS</div>
-            <div class="user-name" id="user-name-badge">Tata Steel Ltd.</div>
+            <div class="user-avatar" id="user-avatar-badge">TM</div>
+            <div class="user-name" id="user-name-badge">Temenos AG</div>
           </div>
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"
             style="color: var(--gray-400);">
@@ -580,10 +589,10 @@
                   <label class="form-label">Total CSR Budget (INR) *</label>
                   <select id="wiz-budget" class="form-control form-control-select" style="padding-left: 14px;">
                     <option value="">Select total budget</option>
-                    <option value="₹25,00,000 - ₹50,00,000" selected>₹25,00,000 - ₹50,00,000</option>
-                    <option value="₹50,00,000 - ₹1,00,00,000">₹50,00,000 - ₹1,00,00,000</option>
-                    <option value="₹1,00,00,000 - ₹5,00,00,000">₹1,00,00,000 - ₹5,00,00,000</option>
-                    <option value="₹5,00,00,000+">₹5,00,00,000+</option>
+                    <option value="2500000">&#8377;25,00,000 &ndash; &#8377;50,00,000</option>
+                    <option value="5000000">&#8377;50,00,000 &ndash; &#8377;1,00,00,000</option>
+                    <option value="20000000" selected>&#8377;1,00,00,000 &ndash; &#8377;5,00,00,000</option>
+                    <option value="50000000">&#8377;5,00,00,000+</option>
                   </select>
                 </div>
 
@@ -600,20 +609,20 @@
                 <div class="form-group">
                   <label class="form-label">Project Duration *</label>
                   <select id="wiz-duration" class="form-control form-control-select" style="padding-left: 14px;">
-                    <option value="6 Months">6 Months</option>
-                    <option value="1 Year (12 Months)" selected>1 Year (12 Months)</option>
-                    <option value="2 Years (24 Months)">2 Years (24 Months)</option>
-                    <option value="3+ Years (Multi-Year)">3+ Years (Multi-Year)</option>
+                    <option value="6">6 Months</option>
+                    <option value="12" selected>1 Year (12 Months)</option>
+                    <option value="24">2 Years (24 Months)</option>
+                    <option value="36">3+ Years (Multi-Year)</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label class="form-label">Number of Projects *</label>
                   <select id="wiz-num-projects" class="form-control form-control-select" style="padding-left: 14px;">
-                    <option value="1 Single Project" selected>1 Single Project</option>
-                    <option value="2 - 5 Projects">2 - 5 Projects</option>
-                    <option value="5 - 10 Projects">5 - 10 Projects</option>
-                    <option value="10+ Projects">10+ Projects</option>
+                    <option value="1">1 Single Project</option>
+                    <option value="5" selected>2 - 5 Projects</option>
+                    <option value="10">5 - 10 Projects</option>
+                    <option value="15">10+ Projects</option>
                   </select>
                 </div>
 
@@ -643,17 +652,16 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">Target State(s) *</label>
-                  <select id="wiz-location" class="form-control form-control-select" style="padding-left: 14px;">
-                    <option value="Jharkhand" selected>Jharkhand</option>
+                  <label class="form-label">Target State(s) * <span style="font-weight:400;color:var(--gray-500);font-size:12px;">(Ctrl/Cmd-click for multiple)</span></label>
+                  <select id="wiz-location" class="form-control form-control-select" multiple size="7"
+                    style="padding-left: 14px; height: auto; min-height: 150px;">
+                    <option value="Tamil Nadu" selected>Tamil Nadu</option>
+                    <option value="Karnataka" selected>Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Telangana">Telangana</option>
                     <option value="Odisha">Odisha</option>
-                    <option value="Bihar">Bihar</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Karnataka">Karnataka</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Uttar Pradesh">Uttar Pradesh</option>
-                    <option value="Chhattisgarh">Chhattisgarh</option>
-                    <option value="Pan-India Multi-State">Pan-India Multi-State</option>
+                    <option value="All India">All India (nationwide partners)</option>
                   </select>
                 </div>
               </div>
@@ -661,8 +669,8 @@
               <div class="form-group" style="margin-bottom: 0;">
                 <label class="form-label">Target District(s) / Aspirational Districts *</label>
                 <input type="text" id="wiz-districts" class="form-control" style="padding-left: 14px;"
-                  placeholder="e.g. Ranchi, West Singhbhum, Dumka (or Aspirational Districts)"
-                  value="Ranchi, West Singhbhum (Aspirational Districts)">
+                  placeholder="e.g. Chennai, Bengaluru Urban, Coimbatore"
+                  value="Chennai, Bengaluru Urban">
               </div>
             </div>
 
@@ -698,27 +706,27 @@
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px;">
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> Primary Education
+                    <input type="checkbox" checked data-group="subsector" value="Primary Education"> Primary Education
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> Smart Classrooms & STEM
+                    <input type="checkbox" checked data-group="subsector" value="Smart Classrooms & STEM"> Smart Classrooms & STEM
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> Teacher Training
+                    <input type="checkbox" checked data-group="subsector" value="Teacher Training"> Teacher Training
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox"> Mobile Health Clinics
+                    <input type="checkbox" data-group="subsector" value="Mobile Health Clinics"> Mobile Health Clinics
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox"> Reforestation & Bio-diversity
+                    <input type="checkbox" data-group="subsector" value="Reforestation & Biodiversity"> Reforestation & Bio-diversity
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox"> Drinking Water Facilities
+                    <input type="checkbox" data-group="subsector" value="Drinking Water Facilities"> Drinking Water Facilities
                   </label>
                 </div>
               </div>
@@ -733,35 +741,35 @@
               <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> Women & Girls
+                  <input type="checkbox" checked data-group="beneficiary" value="Women"> Women & Girls
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> Children (0 - 18 yrs)
+                  <input type="checkbox" checked data-group="beneficiary" value="Children"> Children (0 - 18 yrs)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> Rural Youth
+                  <input type="checkbox" checked data-group="beneficiary" value="Youth"> Rural Youth
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox"> Senior Citizens
+                  <input type="checkbox" data-group="beneficiary" value="Elderly"> Senior Citizens
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox"> Persons with Disabilities (PwD)
+                  <input type="checkbox" data-group="beneficiary" value="Persons with Disabilities"> Persons with Disabilities (PwD)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox"> Small Farmers & Artisans
+                  <input type="checkbox" data-group="beneficiary" value="Small Farmers"> Small Farmers & Artisans
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> Tribal & ST/SC Communities
+                  <input type="checkbox" checked data-group="beneficiary" value="Tribal"> Tribal & ST/SC Communities
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 10px 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox"> Urban Slum Dwellers
+                  <input type="checkbox" data-group="beneficiary" value="Urban Slum Dwellers"> Urban Slum Dwellers
                 </label>
               </div>
             </div>
@@ -783,20 +791,20 @@
                 <div class="form-group">
                   <label class="form-label">NGO Track Record / Experience *</label>
                   <select id="wiz-ngo-exp" class="form-control form-control-select" style="padding-left: 14px;">
-                    <option value="Minimum 3+ Years Experience">Minimum 3+ Years Experience</option>
-                    <option value="Minimum 5+ Years Experience" selected>Minimum 5+ Years Experience</option>
-                    <option value="Minimum 10+ Years Experience">Minimum 10+ Years Experience</option>
-                    <option value="Any Registered & Verified NGO">Any Registered & Verified NGO</option>
+                    <option value="3">Minimum 3+ Years Experience</option>
+                    <option value="5" selected>Minimum 5+ Years Experience</option>
+                    <option value="10">Minimum 10+ Years Experience</option>
+                    <option value="0">Any Registered & Verified NGO</option>
                   </select>
                 </div>
 
                 <div class="form-group">
                   <label class="form-label">Similar Project Experience *</label>
                   <select id="wiz-ngo-similar" class="form-control form-control-select" style="padding-left: 14px;">
-                    <option value="Mandatory (Must have completed 2+ similar projects)" selected>Mandatory (Must have
+                    <option value="true" selected>Mandatory (Must have
                       completed 2+ similar projects)</option>
-                    <option value="Preferred (Prior domain exposure)">Preferred (Prior domain exposure)</option>
-                    <option value="Not Mandatory">Not Mandatory</option>
+                    <option value="true">Preferred (Prior domain exposure)</option>
+                    <option value="false">Not Mandatory</option>
                   </select>
                 </div>
 
@@ -827,23 +835,23 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> 80G Certified (Tax Exemption)
+                    <input type="checkbox" checked data-group="compliance" value="80G"> 80G Certified (Tax Exemption)
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> 12A Registration
+                    <input type="checkbox" checked data-group="compliance" value="12A"> 12A Registration
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> CSR-1 Registered with MCA
+                    <input type="checkbox" checked data-group="compliance" value="CSR-1"> CSR-1 Registered with MCA
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> FCRA Compliant (For Foreign Parent Corporate Grants)
+                    <input type="checkbox" checked data-group="compliance" value="FCRA"> FCRA Compliant (For Foreign Parent Corporate Grants)
                   </label>
                   <label class="checkbox-group"
                     style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                    <input type="checkbox" checked> NITI Aayog Darpan Portal Registered
+                    <input type="checkbox" checked data-group="compliance-note" value="NITI Aayog Darpan"> NITI Aayog Darpan Portal Registered
                   </label>
                 </div>
               </div>
@@ -867,23 +875,23 @@
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> NGO Only (Single verified execution partner)
+                  <input type="checkbox" checked data-group="collaboration" value="NGO Only"> NGO Only (Single verified execution partner)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox"> Multiple NGOs (Consortium of specialized NGOs)
+                  <input type="checkbox" data-group="collaboration" value="Multiple NGOs"> Multiple NGOs (Consortium of specialized NGOs)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> Government + NGO (Joint district admin partnership)
+                  <input type="checkbox" checked data-group="collaboration" value="Government + NGO"> Government + NGO (Joint district admin partnership)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px;">
-                  <input type="checkbox" checked> NGO + Local Community (Self-help group involvement)
+                  <input type="checkbox" checked data-group="collaboration" value="NGO + Local Community"> NGO + Local Community (Self-help group involvement)
                 </label>
                 <label class="checkbox-group"
                   style="margin: 0; background: #FFFFFF; border: 1px solid #E5E7EB; padding: 12px; border-radius: 8px; font-size: 13px; grid-column: span 2;">
-                  <input type="checkbox" checked> Employee Involvement (Corporate employee volunteering & mentorship)
+                  <input type="checkbox" checked id="wiz-employee-involvement" data-group="employee" value="Employee Involvement"> Employee Involvement (Corporate employee volunteering & mentorship)
                 </label>
               </div>
             </div>
@@ -916,7 +924,7 @@
               <div>
                 <p><strong>1. Investment:</strong> <span id="rev-budget">₹25,00,000 - ₹50,00,000</span> (Full Funding)
                 </p>
-                <p><strong>2. Region:</strong> <span id="rev-region">Jharkhand (Ranchi, West Singhbhum)</span></p>
+                <p><strong>2. Region:</strong> <span id="rev-region">Tamil Nadu, Karnataka (Chennai, Bengaluru Urban)</span></p>
                 <p><strong>3. Sector:</strong> <span id="rev-sector">Education & Digital Literacy</span></p>
                 <p><strong>4. Beneficiaries:</strong> Women & Girls, Children, Tribal Communities</p>
               </div>
@@ -944,6 +952,7 @@
 
       <!-- VIEW C: OVERVIEW DASHBOARD (Image 7) -->
       <div id="ws-overview" class="ws-view active">
+        <p id="ws-runs-note" class="ws-page-subtitle" style="margin-bottom:18px;"></p>
         <h1 class="ws-page-title">Overview</h1>
         <p class="ws-page-subtitle">Your CSR journey at a glance.</p>
 
@@ -1065,6 +1074,87 @@
         </div>
       </div>
 
+      <!-- VIEW G: AI ANALYSIS (live results from the NIDHI backend) -->
+      <div id="ws-analysis" class="ws-view">
+        <div class="an-header">
+          <div>
+            <h1 class="ws-page-title">AI Fund Analysis</h1>
+            <p class="ws-page-subtitle">Deterministic scoring and portfolio optimisation
+              over live and knowledge-base evidence. Every figure below is a
+              recommendation for your review, not an approval.</p>
+          </div>
+          <button class="btn-green" id="an-rerun-btn" onclick="showWorkspaceView('ws-launch-csr')">
+            New Analysis
+          </button>
+        </div>
+
+        <!-- empty state -->
+        <div id="an-empty" class="an-empty">
+          <div class="an-empty-icon">
+            <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3>No analysis yet</h3>
+          <p>Complete the 5-step wizard to generate a funding recommendation.</p>
+          <button class="btn-green" onclick="showWorkspaceView('ws-launch-csr')">
+            Start the wizard &rarr;
+          </button>
+        </div>
+
+        <!-- live progress -->
+        <div id="an-progress" class="an-progress" style="display:none;">
+          <div class="an-progress-head">
+            <span class="an-spinner" id="an-spinner"></span>
+            <strong id="an-progress-title">Running analysis&hellip;</strong>
+            <span class="an-source-pill" id="an-source-pill" style="display:none;"></span>
+          </div>
+          <div class="an-stages" id="an-stages"></div>
+          <div class="an-warnings" id="an-warnings"></div>
+        </div>
+
+        <!-- results -->
+        <div id="an-results" style="display:none;">
+          <div class="kpi-cards-grid" id="an-kpis"></div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Recommended Fund Split</h2>
+            <div id="an-fundsplit"></div>
+          </div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Project Scorecards</h2>
+            <p class="an-section-sub">Ten dimensions, scored deterministically.
+              <strong>Confidence</strong> is tracked separately from score: a
+              project can look strong on thin evidence.</p>
+            <div id="an-scorecards"></div>
+          </div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Suggested Implementing Partners</h2>
+            <div id="an-ngos"></div>
+          </div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Partner Comparison</h2>
+            <div class="an-table-scroll"><div id="an-comparison"></div></div>
+          </div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Strategic Insights</h2>
+            <div id="an-insights"></div>
+          </div>
+
+          <div class="an-section">
+            <h2 class="an-section-title">Flagged for Human Review</h2>
+            <div id="an-flags"></div>
+          </div>
+
+          <div class="an-runid" id="an-runid"></div>
+        </div>
+      </div>
+
       <!-- VIEW F: SAVED PROJECTS TABLE & COMPARE MATRIX (Image 10) -->
       <div id="ws-saved" class="ws-view">
         <div class="saved-top-bar">
@@ -1154,6 +1244,10 @@
     </div>
   </div>
 
+  <script src="api.js"></script>
+  <script src="wizard.js"></script>
+  <script src="analysis.js"></script>
+  <script src="company.js"></script>
   <script src="app.js"></script>
 </body>
 

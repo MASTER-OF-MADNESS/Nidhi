@@ -4,197 +4,21 @@
 const state = {
   activeEntity: 'Company', // 'Company', 'NGO', 'Government'
   currentUser: {
-    name: 'Tata Steel Ltd.',
-    code: 'TS',
+    name: 'Temenos AG',
+    code: 'TM',
     role: 'Company Admin'
   },
   wizardStep: 1,
-  savedIds: ['proj-7', 'proj-2', 'proj-3', 'proj-4', 'proj-5', 'proj-6', 'proj-8', 'proj-1'],
-  compareIds: ['proj-7', 'proj-2', 'proj-3'], // Initial 3 checked items from Image 10
+  savedIds: [],
+  compareIds: [],
   
-  projects: [
-    {
-      id: 'proj-1',
-      title: 'Rural Education Support',
-      desc: 'Improving access to quality education in rural schools through infrastructure, learning resources and teacher training.',
-      category: 'Education',
-      categoryClass: 'tag-education',
-      status: 'Completed',
-      statusClass: 'status-completed',
-      location: 'Jharkhand',
-      budget: '₹50,00,000',
-      budgetValue: 5000000,
-      duration: 'Jan 2023 – Dec 2023',
-      img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80',
-      impactScore: 82,
-      impactLevel: 'High',
-      addedDate: '05 Aug 2024'
-    },
-    {
-      id: 'proj-2',
-      title: 'Community Healthcare Initiative',
-      desc: 'Mobile health clinics for underserved communities, providing primary healthcare and awareness programs.',
-      category: 'Healthcare',
-      categoryClass: 'tag-healthcare',
-      status: 'In Progress',
-      statusClass: 'status-in-progress',
-      location: 'Odisha',
-      budget: '₹75,00,000',
-      budgetValue: 7500000,
-      duration: 'Jul 2024 – Dec 2025',
-      img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
-      impactScore: 87,
-      impactLevel: 'High',
-      addedDate: '08 Sep 2024'
-    },
-    {
-      id: 'proj-3',
-      title: 'Clean Water for All',
-      desc: 'Safe drinking water facilities in rural areas through water purification systems and community training.',
-      category: 'Water & Sanitation',
-      categoryClass: 'tag-water',
-      status: 'Completed',
-      statusClass: 'status-completed',
-      location: 'Chhattisgarh',
-      budget: '₹40,00,000',
-      budgetValue: 4000000,
-      duration: 'Mar 2022 – Nov 2022',
-      img: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b7?auto=format&fit=crop&w=600&q=80',
-      impactScore: 76,
-      impactLevel: 'Medium',
-      addedDate: '02 Sep 2024'
-    },
-    {
-      id: 'proj-4',
-      title: 'Green Tomorrow',
-      desc: 'Tree plantation and ecosystem restoration initiatives focusing on urban & semi-urban green belts.',
-      category: 'Environment',
-      categoryClass: 'tag-environment',
-      status: 'Active',
-      statusClass: 'status-active',
-      location: 'Maharashtra',
-      budget: '₹60,00,000',
-      budgetValue: 6000000,
-      duration: 'Apr 2024 – Mar 2026',
-      img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
-      impactScore: 81,
-      impactLevel: 'High',
-      addedDate: '25 Aug 2024'
-    },
-    {
-      id: 'proj-5',
-      title: 'Skilling for Livelihoods',
-      desc: 'Vocational training for youth in technical skills, digital tools, and employment placement assistance.',
-      category: 'Skill Development',
-      categoryClass: 'tag-skill',
-      status: 'Completed',
-      statusClass: 'status-completed',
-      location: 'Karnataka',
-      budget: '₹1,20,00,000',
-      budgetValue: 12000000,
-      duration: 'Jan 2023 – Dec 2024',
-      img: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80',
-      impactScore: 68,
-      impactLevel: 'Medium',
-      addedDate: '20 Aug 2024'
-    },
-    {
-      id: 'proj-6',
-      title: 'Women Empowerment Program',
-      desc: 'Financial literacy, micro-entrepreneurship training, and self-help group formation for rural women.',
-      category: 'Gender Equality',
-      categoryClass: 'tag-gender',
-      status: 'In Progress',
-      statusClass: 'status-in-progress',
-      location: 'Bihar',
-      budget: '₹80,00,000',
-      budgetValue: 8000000,
-      duration: 'Jun 2024 – May 2026',
-      img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
-      impactScore: 64,
-      impactLevel: 'Medium',
-      addedDate: '18 Aug 2024'
-    },
-    {
-      id: 'proj-7',
-      title: 'Digital Learning Hubs',
-      desc: 'Smart classrooms and digital access in government schools to enhance STEM education.',
-      category: 'Education',
-      categoryClass: 'tag-education',
-      status: 'On Hold',
-      statusClass: 'status-on-hold',
-      location: 'Uttar Pradesh',
-      budget: '₹30,00,000',
-      budgetValue: 3000000,
-      duration: 'Sep 2024 – Ongoing',
-      img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80',
-      impactScore: 92,
-      impactLevel: 'High',
-      addedDate: '12 Sep 2024'
-    },
-    {
-      id: 'proj-8',
-      title: 'Nutrition for Children',
-      desc: 'Supplementary nutrition in anganwadis and health monitoring for children under 6 years.',
-      category: 'Healthcare',
-      categoryClass: 'tag-healthcare',
-      status: 'Active',
-      statusClass: 'status-active',
-      location: 'Tamil Nadu',
-      budget: '₹45,00,000',
-      budgetValue: 4500000,
-      duration: 'Feb 2024 – Jan 2026',
-      img: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80',
-      impactScore: 58,
-      impactLevel: 'Low',
-      addedDate: '12 Aug 2024'
-    }
-  ],
+  // Populated from the backend on sign-in (company.js).
+  projects: [],
 
-  recommendations: [
-    {
-      id: 'rec-1',
-      projectId: 'proj-1',
-      title: 'Rural Education Support',
-      category: 'Education',
-      categoryClass: 'tag-education',
-      location: 'Jharkhand',
-      score: 92,
-      impactLevel: 'High Impact',
-      impactClass: 'high',
-      desc: 'Improving access to quality education in rural schools through infrastructure, learning resources and teacher training.',
-      whyText: 'Aligns with your focus on education and has a strong, measurable community impact.',
-      img: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'rec-2',
-      projectId: 'proj-2',
-      title: 'Community Healthcare Initiative',
-      category: 'Healthcare',
-      categoryClass: 'tag-healthcare',
-      location: 'Odisha',
-      score: 78,
-      impactLevel: 'Medium Impact',
-      impactClass: 'medium',
-      desc: 'Mobile health clinics for underserved communities, providing primary healthcare and awareness programs.',
-      whyText: 'Addresses critical healthcare needs in aspirational districts and complements your past initiatives.',
-      img: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 'rec-3',
-      projectId: 'proj-3',
-      title: 'Clean Water for All',
-      category: 'Water & Sanitation',
-      categoryClass: 'tag-water',
-      location: 'Chhattisgarh',
-      score: 55,
-      impactLevel: 'Low Impact',
-      impactClass: 'low',
-      desc: 'Safe drinking water facilities in rural areas through water purification systems and community maintenance training.',
-      whyText: 'Addresses a key social need, though the expected impact is lower compared to your selected focus areas.',
-      img: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b7?auto=format&fit=crop&w=600&q=80'
-    }
-  ]
+  // Produced by an analysis run, not preloaded.
+  recommendations: [],
+  companyProfile: null,
+  runs: [],
 };
 
 // Global DOM Loaded Initializer
@@ -253,18 +77,61 @@ function togglePasswordVisibility(inputId, iconId) {
   }
 }
 
-// Login Handler
-function loginUser(event) {
+// Login Handler -- validates against the backend before entering the workspace.
+async function loginUser(event) {
   if (event) event.preventDefault();
-  
-  // Update Profile Badge
+
+  const username = document.getElementById('username-input')?.value || '';
+  const password = document.getElementById('password-input')?.value || '';
+  const errorEl = document.getElementById('login-error');
+  const submitBtn = document.getElementById('login-submit-btn');
+
+  if (errorEl) errorEl.style.display = 'none';
+
+  // Only the Company portal is backed by a real account today; the NGO and
+  // Government portals remain UI previews.
+  if (state.activeEntity === 'Company') {
+    if (!username || !password) {
+      return showLoginError('Enter your username and password.');
+    }
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Signing in...'; }
+    try {
+      const result = await api.login(username, password);
+      state.currentUser.name = result.company_name || 'Temenos AG';
+      state.currentUser.companyId = result.company_id;
+    } catch (err) {
+      return showLoginError(
+        err.message === 'Failed to fetch'
+          ? 'Cannot reach the NIDHI backend. Start it with: uvicorn main:app --port 8000'
+          : err.message);
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Login →'; }
+    }
+  }
+
   const avatarEl = document.getElementById('user-avatar-badge');
   const nameEl = document.getElementById('user-name-badge');
-  if (avatarEl) avatarEl.textContent = state.activeEntity === 'Company' ? 'TS' : (state.activeEntity === 'NGO' ? 'NG' : 'GV');
-  if (nameEl) nameEl.textContent = state.activeEntity === 'Company' ? 'Tata Steel Ltd.' : (state.activeEntity === 'NGO' ? 'SMILE Foundation' : 'Ministry of CSR');
+  if (avatarEl) avatarEl.textContent = state.activeEntity === 'Company' ? 'TM' : (state.activeEntity === 'NGO' ? 'NG' : 'GV');
+  if (nameEl) nameEl.textContent = state.activeEntity === 'Company' ? state.currentUser.name : (state.activeEntity === 'NGO' ? 'SMILE Foundation' : 'Ministry of CSR');
 
   showScreen('screen-workspace');
   showWorkspaceView('ws-landing');
+
+  // Swap the demo dataset for the signed-in company's real CSR record.
+  if (state.activeEntity === 'Company') {
+    loadCompanyData(state.currentUser.companyId || 'temenos');
+  }
+}
+
+function showLoginError(message) {
+  const errorEl = document.getElementById('login-error');
+  if (errorEl) {
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+  } else {
+    alert(message);
+  }
+  return false;
 }
 
 // Registration Handler
@@ -365,7 +232,7 @@ function goToWizardStep(step) {
     const revSector = document.getElementById('rev-sector');
     
     if (revBudget) revBudget.textContent = document.getElementById('wiz-budget')?.value || '₹25,00,000 - ₹50,00,000';
-    if (revRegion) revRegion.textContent = `${document.getElementById('wiz-location')?.value || 'Jharkhand'} (${document.getElementById('wiz-districts')?.value || 'Ranchi'})`;
+    if (revRegion) revRegion.textContent = `${selectedOptions('wiz-location').join(', ') || 'not selected'} (${document.getElementById('wiz-districts')?.value || 'all districts'})`;
     if (revSector) revSector.textContent = document.getElementById('wiz-cause')?.value || 'Education & Digital Literacy';
   }
 }
@@ -383,39 +250,21 @@ function prevWizardStep() {
 }
 
 function completeLaunchCSR() {
-  // Extract inputs
-  const title = document.getElementById('wiz-title')?.value || 'New CSR Project';
-  const category = document.getElementById('wiz-cause')?.value || 'Education';
-  const location = document.getElementById('wiz-location')?.value || 'National';
-  const budget = document.getElementById('wiz-budget')?.value || '₹50,00,000';
-  const desc = document.getElementById('wiz-description')?.value || 'CSR initiative focused on sustainable social impact.';
+  const { payload, errors } = parseWizard();
 
-  // Create new project
-  const newProj = {
-    id: `proj-${Date.now()}`,
-    title,
-    desc,
-    category,
-    categoryClass: category === 'Education' ? 'tag-education' : (category === 'Healthcare' ? 'tag-healthcare' : 'tag-environment'),
-    status: 'Active',
-    statusClass: 'status-active',
-    location,
-    budget,
-    budgetValue: 5000000,
-    duration: 'Sep 2026 – Ongoing',
-    img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80',
-    impactScore: 88,
-    impactLevel: 'High',
-    addedDate: 'Today'
-  };
+  if (errors.length) {
+    const lines = ['Please complete the following before running the analysis:', '']
+      .concat(errors.map(function (e) { return '- ' + e; }));
+    alert(lines.join(String.fromCharCode(10)));
+    return;
+  }
 
-  state.projects.unshift(newProj);
-  renderProjectsGrid();
-  renderSavedProjectsTable();
-
-  alert('Congratulations! Your CSR Project has been successfully launched!');
-  showWorkspaceView('ws-all-projects');
+  // Hand off to the backend. Results stream into the AI Analysis view.
+  // Nothing is 'launched' or approved here -- the output is a recommendation
+  // for a human to decide on.
+  runAnalysis(payload);
 }
+
 
 
 /* =========================================================
@@ -558,7 +407,7 @@ function renderSavedProjectsTable() {
         <td>
           <span class="table-impact-pill ${p.impactLevel.toLowerCase()}">
             <span class="table-impact-dot"></span>
-            ${p.impactScore} ${p.impactLevel}
+            ${p.impactScore === null ? '&mdash;' : p.impactScore} ${p.impactLevel}
           </span>
         </td>
         <td style="color: var(--gray-500);">${p.addedDate}</td>
@@ -661,7 +510,7 @@ function openCompareModal() {
           ${selectedProjects.map(p => `
             <td>
               <span class="table-impact-pill ${p.impactLevel.toLowerCase()}">
-                ${p.impactScore} ${p.impactLevel}
+                ${p.impactScore === null ? '&mdash;' : p.impactScore} ${p.impactLevel}
               </span>
             </td>
           `).join('')}
@@ -718,7 +567,7 @@ function openProjectModal(id) {
     <div style="background-color: #F8FAF9; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
       <h4 style="font-size: 15px; font-weight: 700; color: var(--navy-900); margin-bottom: 8px;">Key Performance Indicators (KPIs)</h4>
       <ul style="padding-left: 20px; font-size: 13px; color: var(--gray-700); line-height: 1.6;">
-        <li>100% verified baseline impact metric score of ${p.impactScore}/100</li>
+        <li>${p.impactScore === null ? 'No NIDHI impact score: this is a historical record, not a scored proposal.' : 'Baseline impact metric score of ' + p.impactScore + '/100'}</li>
         <li>Direct coverage across 12 aspirational districts</li>
         <li>Quarterly audit compliance verified by NIDHI CSR Governance Board</li>
       </ul>
