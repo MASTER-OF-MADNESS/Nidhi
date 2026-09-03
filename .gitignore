@@ -1,0 +1,25 @@
+# Secrets — never commit
+.env
+.env.local
+*.key
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Databases (run logs are local state)
+*.db
+*.db-wal
+*.db-shm
+
+# Node (e2e test dependencies)
+node_modules/
+package-lock.json
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

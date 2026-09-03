@@ -1,0 +1,23 @@
+{
+  "total_csr_budget": 20000000,
+  "funding_type": "Grant",
+  "project_duration": 18,
+  "number_of_projects": 5,
+  "min_project_funding": 1000000,
+  "max_project_funding": 6000000,
+  "country": "India",
+  "states": ["Tamil Nadu", "Karnataka"],
+  "districts": ["Chennai", "Bengaluru Urban"],
+  "csr_sector": "Education",
+  "csr_sub_sector": "Digital literacy",
+  "beneficiary_categories": ["Children", "Youth", "Women"],
+  "ngo_experience": 0,
+  "similar_project_experience": true,
+  "geographic_capability": "Multi-state",
+  "ngo_rating": "Gold",
+  "compliance_requirements": ["CSR-1", "12A", "80G"],
+  "collaboration_type": "NGO + Local Community",
+  "employee_involvement": true,
+  "additional_comments": "Prefer projects with measurable learning outcomes.",
+  "currency": "INR"
+}
