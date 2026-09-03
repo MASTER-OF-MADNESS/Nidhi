@@ -116,8 +116,8 @@ def _extract_json(text: str) -> dict[str, Any] | None:
     return None
 
 
-async def _generate(prompt: str, *, json_schema: dict | None = None) -> str | None:
-    """One non-streaming call, retried, returning None on definitive failure."""
+async def _generate_gemini(prompt: str, *, json_schema: dict | None = None) -> str | None:
+    """One non-streaming Gemini call, retried, None on definitive failure."""
     client = _client()
     if client is None:
         return None
@@ -162,8 +162,8 @@ async def _generate(prompt: str, *, json_schema: dict | None = None) -> str | No
     return None
 
 
-async def _generate_stream(prompt: str) -> AsyncIterator[str]:
-    """Stream text chunks. Yields nothing at all if the model is unavailable."""
+async def _generate_gemini_stream(prompt: str) -> AsyncIterator[str]:
+    """Stream Gemini chunks. Yields nothing if Gemini is unavailable."""
     client = _client()
     if client is None:
         return
@@ -196,6 +196,72 @@ async def _generate_stream(prompt: str) -> AsyncIterator[str]:
                 yield text
     except Exception as exc:
         log.warning("Gemini streaming failed: %s: %s", type(exc).__name__, exc)
+
+
+# ---------------------------------------------------------------------------
+# Provider chain
+#
+# Gemini first, then xAI (Grok), then nothing -- at which point the caller uses
+# its deterministic fallback. Each call records which provider actually
+# answered so the run can tell the user where its prose came from.
+# ---------------------------------------------------------------------------
+
+#: Provider that answered the most recent successful call, or None.
+last_provider: str | None = None
+
+
+def _enabled_providers() -> list[str]:
+    from engine import xai_client
+    checks = {"gemini": lambda: bool(config.GEMINI_API_KEY),
+              "xai": xai_client.available}
+    return [name for name in config.LLM_PROVIDER_ORDER
+            if name in checks and checks[name]()]
+
+
+async def _generate(prompt: str, *, json_schema: dict | None = None) -> str | None:
+    """Try each configured provider in order; None when all of them fail."""
+    global last_provider
+    from engine import xai_client
+
+    for provider in _enabled_providers():
+        if provider == "gemini":
+            text = await _generate_gemini(prompt, json_schema=json_schema)
+        elif provider == "xai":
+            log.info("Falling back to xAI (%s)", config.XAI_MODEL)
+            text = await xai_client.generate(prompt, json_schema=json_schema)
+        else:
+            continue
+        if text:
+            last_provider = provider
+            return text
+    last_provider = None
+    return None
+
+
+async def _generate_stream(prompt: str) -> AsyncIterator[str]:
+    """Stream from the first provider that produces anything."""
+    global last_provider
+    from engine import xai_client
+
+    for provider in _enabled_providers():
+        produced = False
+        source = (_generate_gemini_stream(prompt) if provider == "gemini"
+                  else xai_client.generate_stream(prompt))
+        async for chunk in source:
+            produced = True
+            yield chunk
+        if produced:
+            last_provider = provider
+            return
+        if provider != _enabled_providers()[-1]:
+            log.info("Provider %s produced nothing; trying the next.", provider)
+    last_provider = None
+
+
+def provider_status() -> dict[str, bool]:
+    """Which providers are configured, for the health endpoint."""
+    from engine import xai_client
+    return {"gemini": bool(config.GEMINI_API_KEY), "xai": xai_client.available()}
 
 
 # ---------------------------------------------------------------------------
@@ -386,17 +452,28 @@ async def extract_candidates(
     candidates: list[CandidateProject] = []
     for index, raw in enumerate(raw_projects):
         if isinstance(raw, dict) and (c := _coerce_candidate(raw, index, pack, request)):
+            # Record the provider so the user can tell Grok output from Gemini.
+            c.extraction_method = last_provider or "gemini"
             candidates.append(c)
         if len(candidates) >= config.MAX_CANDIDATE_PROJECTS:
             break
 
     if not candidates:
+        tried = _enabled_providers()
+        names = " and ".join(
+            {"gemini": f"Gemini ({config.GEMINI_MODEL})",
+             "xai": f"Grok ({config.XAI_MODEL})"}.get(p, p) for p in tried
+        ) or "no model provider"
         warnings.append(
-            "Gemini extraction unavailable or unusable; "
-            "candidates derived by rule-based extraction instead."
-        )
+            f"{names} unavailable or unusable; candidates derived by "
+            f"rule-based extraction instead.")
         candidates = rule_based_candidates(pack, request)
-    elif len(candidates) < len(raw_projects):
+    elif last_provider and last_provider != "gemini":
+        warnings.append(
+            f"Gemini was unavailable; candidates were extracted by "
+            f"{last_provider} ({config.XAI_MODEL}) instead.")
+
+    if candidates and len(candidates) < len(raw_projects):
         warnings.append(
             f"Discarded {len(raw_projects) - len(candidates)} model-proposed "
             f"project(s) not anchored to a retrieved NGO."
@@ -461,9 +538,17 @@ async def explain_projects(
 
     missing = [pid for pid in fallbacks if pid not in explanations]
     if len(missing) == len(fallbacks):
+        tried = _enabled_providers()
+        names = " and ".join(
+            {"gemini": f"Gemini ({config.GEMINI_MODEL})",
+             "xai": f"Grok ({config.XAI_MODEL})"}.get(p, p) for p in tried
+        ) or "no model provider"
         warnings.append(
-            "Gemini explanations unavailable; using rule-based text for every "
-            "project.")
+            f"{names} unavailable; using rule-based text for every project.")
+    elif last_provider and last_provider != "gemini":
+        warnings.append(
+            f"Explanations were written by Grok ({config.XAI_MODEL}); "
+            f"Gemini was unavailable.")
     elif missing:
         warnings.append(
             f"Gemini omitted {len(missing)} project explanation(s); those use "

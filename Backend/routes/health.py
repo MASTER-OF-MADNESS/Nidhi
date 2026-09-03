@@ -13,7 +13,7 @@ from fastapi import APIRouter
 
 import config
 from db.database import get_connection
-from engine import gemini_client
+from engine import gemini_client, xai_client
 from models.schemas import HealthResponse
 from retrieval import tavily_search
 
@@ -30,12 +30,14 @@ def _database_ok() -> tuple[bool, str]:
 
 
 async def _probe() -> HealthResponse:
-    gemini, tavily, database = await asyncio.gather(
+    gemini, grok, tavily, database = await asyncio.gather(
         gemini_client.health_check(),
+        xai_client.health_check(),
         tavily_search.health_check(),
         asyncio.to_thread(_database_ok),
     )
     gemini_ok, gemini_detail = gemini
+    grok_ok, grok_detail = grok
     tavily_ok, tavily_detail = tavily
     db_ok, db_detail = database
 
@@ -44,12 +46,13 @@ async def _probe() -> HealthResponse:
     return HealthResponse(
         status="ok" if db_ok else "degraded",
         gemini=gemini_ok,
+        grok=grok_ok,
         tavily=tavily_ok,
         database=db_ok,
         company_id=config.COMPANY_ID,
         model=config.GEMINI_MODEL,
-        detail={"gemini": gemini_detail, "tavily": tavily_detail,
-                "database": db_detail},
+        detail={"gemini": gemini_detail, "grok": grok_detail,
+                "tavily": tavily_detail, "database": db_detail},
     )
 
 

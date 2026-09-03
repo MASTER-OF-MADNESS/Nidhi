@@ -106,9 +106,13 @@ function renderOverview(c) {
 
   const evidence = Object.entries(c.evidence_summary || {})
     .map(([k, v]) => `${v} ${k.toLowerCase().replace(/_/g, ' ')}`).join(', ');
+  const PROVIDERS = {
+    gemini: 'Gemini', xai: 'Grok', rule_based: 'rule-based (no model available)',
+  };
+  const writer = PROVIDERS[c.extraction_method] || c.extraction_method;
   el('an-runid').innerHTML =
     `Run ${esc(c.run_id)} &middot; ${esc(c.ngos_considered)} organisations considered &middot; ` +
-    `evidence: ${esc(evidence)}`;
+    `candidates by ${esc(writer)} &middot; evidence: ${esc(evidence)}`;
 }
 
 /* ---------------------------------------------------------

@@ -80,6 +80,20 @@ GEMINI_MODEL = _env("GEMINI_MODEL") or "gemini-2.5-flash"
 GEMINI_TIMEOUT = _env_int("GEMINI_TIMEOUT", 60)
 GEMINI_MAX_RETRIES = _env_int("GEMINI_MAX_RETRIES", 2)
 
+# xAI (Grok) is the second model provider: used when Gemini is unavailable,
+# rate-limited, or out of quota, before falling back to rule-based output.
+XAI_API_KEY = _env("XAI_API_KEY")
+XAI_MODEL = _env("XAI_MODEL") or "grok-4-fast"
+XAI_BASE_URL = _env("XAI_BASE_URL") or "https://api.x.ai/v1"
+XAI_TIMEOUT = _env_int("XAI_TIMEOUT", 60)
+
+# Order the providers are tried in. Trimmed automatically to whichever have
+# keys configured.
+LLM_PROVIDER_ORDER = tuple(
+    p.strip().lower() for p in (_env("LLM_PROVIDER_ORDER") or "gemini,xai").split(",")
+    if p.strip()
+)
+
 TAVILY_TIMEOUT = _env_int("TAVILY_TIMEOUT", 8)
 MAX_TAVILY_RESULTS = _env_int("MAX_TAVILY_RESULTS", 10)
 # Below this many usable NGOs, Tavily is considered insufficient -> MD fallback.

@@ -192,3 +192,22 @@ def test_quota_error_is_not_retried(monkeypatch):
 
     assert result is None
     assert len(attempts) == 1, f"retried {len(attempts)} times on a quota error"
+
+
+def test_titles_made_only_of_generic_words_are_rejected():
+    """
+    "CSR Initiatives" and "Social Projects" are page labels. Live search
+    returned both, and without this they became NGOs the system recommended
+    funding.
+    """
+    for junk in ("CSR Initiatives", "Social Projects", "Our Work",
+                 "Corporate Social Responsibility", "Community Development",
+                 "CSR Activities"):
+        assert not ts._looks_like_organisation(junk), junk
+
+
+def test_real_multiword_ngo_names_survive_the_generic_filter():
+    for real in ("Akshaya Patra Foundation", "Sevalaya Trust", "Grow-Trees",
+                 "Environmentalist Foundation of India",
+                 "Agastya International Foundation"):
+        assert ts._looks_like_organisation(real), real

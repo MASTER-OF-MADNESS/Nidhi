@@ -44,6 +44,18 @@ _NON_ORG_HINTS = (
 # Generic page titles that are navigation labels, not organisation names.
 # A result titled "Projects" or "Home" carries no identity, and letting one
 # through produces recommendations addressed to an NGO called "Projects".
+# Individual words that carry no organisational identity. A title made only of
+# these is a page label.
+_GENERIC_WORDS = {
+    "csr", "project", "projects", "initiative", "initiatives", "program",
+    "programs", "programme", "programmes", "social", "our", "work", "works",
+    "home", "about", "us", "contact", "impact", "partners", "partner",
+    "donate", "welcome", "index", "overview", "services", "gallery", "media",
+    "resources", "ngo", "ngos", "foundation", "trust", "charity", "sitemap",
+    "search", "the", "and", "of", "for", "activities", "responsibility",
+    "corporate", "sustainability", "community", "development", "page", "list",
+}
+
 _GENERIC_TITLES = {
     "projects", "project", "home", "about", "about us", "contact", "contact us",
     "our work", "our projects", "programs", "programmes", "initiatives",
@@ -94,6 +106,12 @@ def _looks_like_organisation(title: str) -> bool:
     # word count says nothing. What disqualifies a title is being a generic
     # navigation label.
     if probe in _GENERIC_TITLES:
+        return False
+    # A title built entirely from generic words -- "CSR Initiatives",
+    # "Social Projects", "Our Work" -- names a page, not an organisation.
+    # Without this, such a page becomes an NGO the system recommends funding.
+    words = [w for w in re.split(r"[^a-z0-9]+", probe) if w]
+    if words and all(w in _GENERIC_WORDS for w in words):
         return False
     return not any(hint in probe for hint in _NON_ORG_HINTS)
 

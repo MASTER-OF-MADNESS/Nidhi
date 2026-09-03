@@ -37,11 +37,15 @@ Sign in with the credentials in `.env` (defaults `temenos_admin` /
   that one line — nothing else refers to a model.
 - **The free tier allows 20 Gemini requests per day.** A run costs about 4
   (extraction, batched explanations, portfolio insights), so roughly 5 runs a
-  day. Exceeding it returns HTTP 429 and NIDHI falls back to rule-based
-  extraction and deterministic prose — the run still completes, with a warning
-  frame saying so. A paid key removes the limit.
+  day. Exceeding it returns HTTP 429, and NIDHI moves to the next provider.
+- **xAI (Grok) is the second provider.** Set `XAI_API_KEY` and it is tried
+  whenever Gemini is unavailable, rate-limited or out of quota. Only if it also
+  fails does the system fall back to rule-based extraction and deterministic
+  prose. Every response says which provider answered, and a warning frame names
+  any that were tried and failed.
 
-Tavily has no such constraint at this volume.
+Provider order is `LLM_PROVIDER_ORDER` (default `gemini,xai`); providers with no
+key are skipped. Tavily has no such constraint at this volume.
 
 ## Layout
 
@@ -68,7 +72,8 @@ cd tests-e2e && node e2e_test.js                                 # needs server 
    fallback when it fails, times out, or returns fewer than three usable NGOs.
    Candidates are drawn per requested state so one state cannot crowd out another.
 2. **Extraction** — Gemini turns the evidence into candidate projects, each
-   anchored to a real retrieved NGO. A rule-based path covers model failure.
+   anchored to a real retrieved NGO. If Gemini is down, Grok is tried next; a
+   rule-based path covers both failing.
 3. **Scoring** — ten dimensions, pure deterministic maths, no AI.
 4. **Optimisation** — OR-Tools CP-SAT allocates the budget, maximising impact
    weighted by money deployed, under the portfolio constraints.
@@ -81,7 +86,7 @@ cd tests-e2e && node e2e_test.js                                 # needs server 
 |---|---|
 | **UNKNOWN is not ZERO.** A missing field scores a neutral prior at zero confidence and is named for review. | `engine/scoring_engine.py`, `retrieval/text_utils.clean_value` |
 | **AI never scores.** Gemini extracts, classifies and explains. Every number is deterministic. | `engine/gemini_client.py`, `engine/scoring_engine.py` |
-| **Always return something.** Tavily → knowledge base; Gemini → rules; CP-SAT → greedy. | every engine module |
+| **Always return something.** Tavily → knowledge base; Gemini → Grok → rules; CP-SAT → greedy. | every engine module |
 | **Relaxations are never silent.** Any constraint the solver drops is named in the response. | `engine/ortools_optimizer.py` |
 | **Audit everything.** Every run persisted with full inputs and outputs. | `db/crud.py` |
 | **Decision support, not approval.** Output says "recommended", never "approved". | `engine/explainer.GUARDRAIL` |

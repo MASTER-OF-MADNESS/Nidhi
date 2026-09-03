@@ -36,7 +36,7 @@ These are enforced in code and covered by tests, not just documented.
 | **AI never scores.** Gemini extracts, classifies and explains. Every number comes from deterministic code. | `engine/gemini_client.py` prompt, `engine/scoring_engine.py` |
 | **Model calls are batched.** All project explanations come from one request, not one per project, so a free-tier key (20/day) survives several runs. | `engine/gemini_client.explain_projects` |
 | **Tavily first, knowledge base as fallback.** Falls back on failure, timeout, or fewer than 3 usable NGOs. | `engine/evidence_builder.py` |
-| **Always return something.** Tavily → MD; Gemini → rule-based; CP-SAT → greedy. | every engine module |
+| **Always return something.** Tavily → MD; Gemini → Grok (xAI) → rule-based; CP-SAT → greedy. | `engine/gemini_client._generate`, `engine/xai_client.py` |
 | **Audit everything.** Every run persisted with full inputs and outputs; every score carries its reasons. | `db/crud.py`, `ProjectScore.rca` |
 | **Decision support, not approval.** Output says "recommended", never "approved". | `engine/explainer.GUARDRAIL` |
 

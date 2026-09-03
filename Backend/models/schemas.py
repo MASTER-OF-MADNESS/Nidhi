@@ -416,6 +416,7 @@ class SSEEvent(BaseModel):
 class HealthResponse(BaseModel):
     status: str = "ok"
     gemini: bool = False
+    grok: bool = False
     tavily: bool = False
     database: bool = False
     company_id: str = ""
