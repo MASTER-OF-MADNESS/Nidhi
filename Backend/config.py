@@ -333,6 +333,9 @@ SECTOR_CAP = _env_float("SECTOR_CAP", 0.40)
 MIN_WOMEN_SHARE = _env_float("MIN_WOMEN_SHARE", 0.15)
 MIN_ENVIRONMENT_SHARE = _env_float("MIN_ENVIRONMENT_SHARE", 0.15)
 OPTIMIZER_TIME_LIMIT = _env_float("OPTIMIZER_TIME_LIMIT", 10.0)
+# Working out which constraint blocked a project costs a solve per
+# relaxation rung, so only the strongest near-misses are diagnosed.
+MAX_EXCLUSIONS_DIAGNOSED = _env_int("MAX_EXCLUSIONS_DIAGNOSED", 10)
 
 # Selection must dominate the allocation term in the blended objective, so that
 # the solver never drops a high-scoring project to shift money elsewhere.

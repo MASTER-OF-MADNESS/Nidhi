@@ -13,7 +13,7 @@ import config
 config.GEMINI_API_KEY = ""            # force the chain past Gemini
 config.XAI_API_KEY = "stub-key"
 
-from engine import gemini_client as gc, evidence_builder as eb, xai_client
+from engine import gemini_client as gc, evidence_builder as eb
 from engine.scoring_engine import score_projects
 from models.schemas import GenerateRequest
 

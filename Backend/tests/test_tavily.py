@@ -188,9 +188,9 @@ def test_quota_error_is_not_retried(monkeypatch):
 
     monkeypatch.setattr(cfg, "GEMINI_API_KEY", "x")
     monkeypatch.setattr(gc, "_client", lambda: Boom())
-    result = asyncio.run(gc._generate("hello"))
+    text, provider = asyncio.run(gc._generate("hello"))
 
-    assert result is None
+    assert text is None and provider is None
     assert len(attempts) == 1, f"retried {len(attempts)} times on a quota error"
 
 

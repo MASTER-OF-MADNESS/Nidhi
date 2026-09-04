@@ -7,7 +7,6 @@ never by silently dropping a constraint.
 """
 
 import config
-import pytest
 
 from engine.ortools_optimizer import optimize
 from models.schemas import GenerateRequest, ProjectScore

@@ -14,7 +14,6 @@ answer to a funding question.
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from typing import AsyncIterator
 
@@ -123,7 +122,10 @@ async def run_pipeline(
 
     # --- 4. Optimisation ---------------------------------------------------
     yield _progress("optimization", "running")
-    outcome = ortools_optimizer.optimize(scores, request)
+    # CP-SAT is synchronous and CPU-bound. Running it inline would block the
+    # event loop for its whole duration, stalling every other request and the
+    # keep-alive on this one.
+    outcome = await asyncio.to_thread(ortools_optimizer.optimize, scores, request)
     yield _progress("optimization", "done",
                     content={"solver": outcome.constraint_report.solver,
                              "status": outcome.constraint_report.status,

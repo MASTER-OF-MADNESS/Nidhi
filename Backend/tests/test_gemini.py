@@ -12,7 +12,6 @@ import config
 import pytest
 
 from engine import evidence_builder as eb, gemini_client as gc
-from retrieval import tavily_search as ts
 
 
 @pytest.fixture
@@ -21,9 +20,9 @@ def pack(sample_request, monkeypatch):
     return asyncio.run(eb.build_evidence_pack(sample_request))
 
 
-def _fake_response(payload: dict):
+def _fake_response(payload: dict, provider: str = "gemini"):
     async def _gen(prompt, json_schema=None):
-        return json.dumps(payload)
+        return json.dumps(payload), provider
     return _gen
 
 
@@ -121,7 +120,7 @@ def test_model_budget_is_clamped_to_the_requested_range(pack, sample_request, mo
 
 def test_malformed_model_output_falls_back(pack, sample_request, monkeypatch):
     async def _garbage(prompt, json_schema=None):
-        return "I'm afraid I can't do that."
+        return "I'm afraid I can't do that.", "gemini"
     monkeypatch.setattr(gc, "_generate", _garbage)
     candidates, warnings = asyncio.run(gc.extract_candidates(pack, sample_request))
     assert candidates

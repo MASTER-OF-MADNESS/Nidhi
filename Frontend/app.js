@@ -1,5 +1,16 @@
 // NIDHI CSR Platform Application Logic
 
+// Escaping for anything interpolated into innerHTML. Project and partner text
+// can originate from live web search, so it is never trusted markup.
+// analysis.js defines esc() first; this is the fallback if it is absent.
+if (typeof esc !== 'function') {
+  window.esc = function (text) {
+    return String(text ?? '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+  };
+}
+
 // Initial Data Store
 const state = {
   activeEntity: 'Company', // 'Company', 'NGO', 'Government'
@@ -279,30 +290,30 @@ function renderProjectsGrid(filteredCategory = 'All') {
     : state.projects.filter(p => p.category === filteredCategory);
 
   grid.innerHTML = displayList.map(p => `
-    <div class="project-card" onclick="openProjectModal('${p.id}')">
+    <div class="project-card" onclick="openProjectModal('${esc(p.id)}')">
       <div class="project-card-img-wrap">
-        <img class="project-card-img" src="${p.img}" alt="${p.title}" />
+        <img class="project-card-img" src="${esc(p.img)}" alt="${esc(p.title)}" />
       </div>
       <div class="project-card-body">
         <div class="project-tags">
-          <span class="tag-pill ${p.categoryClass}">${p.category}</span>
-          <span class="status-pill ${p.statusClass}">${p.status}</span>
+          <span class="tag-pill ${esc(p.categoryClass)}">${esc(p.category)}</span>
+          <span class="status-pill ${esc(p.statusClass)}">${esc(p.status)}</span>
         </div>
-        <h3 class="project-card-title">${p.title}</h3>
-        <p class="project-card-desc">${p.desc}</p>
+        <h3 class="project-card-title">${esc(p.title)}</h3>
+        <p class="project-card-desc">${esc(p.desc)}</p>
         
         <div class="project-meta-list">
           <div class="project-meta-item">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span>${p.location}</span>
+            <span>${esc(p.location)}</span>
           </div>
           <div class="project-meta-item">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>${p.budget}</span>
+            <span>${esc(p.budget)}</span>
           </div>
           <div class="project-meta-item">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            <span>${p.duration}</span>
+            <span>${esc(p.duration)}</span>
           </div>
         </div>
 
@@ -326,39 +337,39 @@ function renderRecommendations() {
     const isSaved = state.savedIds.includes(rec.projectId);
     return `
       <div class="rec-card">
-        <div class="rec-impact-pill ${rec.impactClass}">
+        <div class="rec-impact-pill ${esc(rec.impactClass)}">
           <div class="rec-impact-score">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-            <span>${rec.score}</span>
+            <span>${esc(rec.score)}</span>
           </div>
-          <span class="rec-impact-label">${rec.impactLevel}</span>
+          <span class="rec-impact-label">${esc(rec.impactLevel)}</span>
         </div>
 
         <div class="rec-card-header">
-          <img class="rec-card-img" src="${rec.img}" alt="${rec.title}" />
+          <img class="rec-card-img" src="${esc(rec.img)}" alt="${esc(rec.title)}" />
         </div>
 
-        <span class="tag-pill ${rec.categoryClass}" style="align-self: flex-start; margin-bottom: 8px;">${rec.category}</span>
-        <h3 class="rec-card-title">${rec.title}</h3>
+        <span class="tag-pill ${esc(rec.categoryClass)}" style="align-self: flex-start; margin-bottom: 8px;">${esc(rec.category)}</span>
+        <h3 class="rec-card-title">${esc(rec.title)}</h3>
         
         <div class="rec-location">
           <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          <span>${rec.location}</span>
+          <span>${esc(rec.location)}</span>
         </div>
 
-        <p class="rec-desc">${rec.desc}</p>
+        <p class="rec-desc">${esc(rec.desc)}</p>
 
-        <div class="rec-why-box ${rec.impactClass}">
+        <div class="rec-why-box ${esc(rec.impactClass)}">
           <svg class="why-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
           <div>
             <div class="why-title">Why it is recommended?</div>
-            <div class="why-text">${rec.whyText}</div>
+            <div class="why-text">${esc(rec.whyText)}</div>
           </div>
         </div>
 
         <div class="rec-actions">
-          <button class="btn-navy" onclick="openProjectModal('${rec.projectId}')">View Details &rarr;</button>
-          <button class="btn-save-toggle ${isSaved ? 'saved' : ''}" onclick="toggleSaveProject('${rec.projectId}')">
+          <button class="btn-navy" onclick="openProjectModal('${esc(rec.projectId)}')">View Details &rarr;</button>
+          <button class="btn-save-toggle ${isSaved ? 'saved' : ''}" onclick="toggleSaveProject('${esc(rec.projectId)}')">
             <svg width="16" height="16" fill="${isSaved ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
             <span>${isSaved ? 'Saved' : 'Save'}</span>
           </button>
@@ -383,36 +394,36 @@ function renderSavedProjectsTable() {
     return `
       <tr>
         <td>
-          <input type="checkbox" class="table-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCompareSelect('${p.id}', this.checked)" />
+          <input type="checkbox" class="table-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCompareSelect('${esc(p.id)}', this.checked)" />
         </td>
         <td>
           <div class="table-project-cell">
-            <img class="table-thumb" src="${p.img}" alt="${p.title}" />
+            <img class="table-thumb" src="${esc(p.img)}" alt="${esc(p.title)}" />
             <div>
-              <div class="table-project-name">${p.title}</div>
-              <div class="table-project-sub">${p.desc}</div>
+              <div class="table-project-name">${esc(p.title)}</div>
+              <div class="table-project-sub">${esc(p.desc)}</div>
             </div>
           </div>
         </td>
         <td>
-          <span class="tag-pill ${p.categoryClass}">${p.category}</span>
+          <span class="tag-pill ${esc(p.categoryClass)}">${esc(p.category)}</span>
         </td>
         <td>
           <span style="display: flex; align-items: center; gap: 4px;">
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-            ${p.location}
+            ${esc(p.location)}
           </span>
         </td>
-        <td style="font-weight: 600;">${p.budget}</td>
+        <td style="font-weight: 600;">${esc(p.budget)}</td>
         <td>
-          <span class="table-impact-pill ${p.impactLevel.toLowerCase()}">
+          <span class="table-impact-pill ${esc(p.impactLevel.toLowerCase())}">
             <span class="table-impact-dot"></span>
-            ${p.impactScore === null ? '&mdash;' : p.impactScore} ${p.impactLevel}
+            ${p.impactScore === null ? '&mdash;' : p.impactScore} ${esc(p.impactLevel)}
           </span>
         </td>
-        <td style="color: var(--gray-500);">${p.addedDate}</td>
+        <td style="color: var(--gray-500);">${esc(p.addedDate)}</td>
         <td>
-          <span class="table-action-link" onclick="openProjectModal('${p.id}')">
+          <span class="table-action-link" onclick="openProjectModal('${esc(p.id)}')">
             View &rarr;
           </span>
         </td>
@@ -486,8 +497,8 @@ function openCompareModal() {
           <th>Metric / Attribute</th>
           ${selectedProjects.map(p => `
             <th class="compare-project-head">
-              <img src="${p.img}" alt="${p.title}" />
-              <div class="compare-project-title">${p.title}</div>
+              <img src="${esc(p.img)}" alt="${esc(p.title)}" />
+              <div class="compare-project-title">${esc(p.title)}</div>
             </th>
           `).join('')}
         </tr>
@@ -495,22 +506,22 @@ function openCompareModal() {
       <tbody>
         <tr>
           <th>Category</th>
-          ${selectedProjects.map(p => `<td><span class="tag-pill ${p.categoryClass}">${p.category}</span></td>`).join('')}
+          ${selectedProjects.map(p => `<td><span class="tag-pill ${esc(p.categoryClass)}">${esc(p.category)}</span></td>`).join('')}
         </tr>
         <tr>
           <th>Location</th>
-          ${selectedProjects.map(p => `<td>${p.location}</td>`).join('')}
+          ${selectedProjects.map(p => `<td>${esc(p.location)}</td>`).join('')}
         </tr>
         <tr>
           <th>Budget (INR)</th>
-          ${selectedProjects.map(p => `<td style="font-weight:700;">${p.budget}</td>`).join('')}
+          ${selectedProjects.map(p => `<td style="font-weight:700;">${esc(p.budget)}</td>`).join('')}
         </tr>
         <tr>
           <th>Impact Score</th>
           ${selectedProjects.map(p => `
             <td>
-              <span class="table-impact-pill ${p.impactLevel.toLowerCase()}">
-                ${p.impactScore === null ? '&mdash;' : p.impactScore} ${p.impactLevel}
+              <span class="table-impact-pill ${esc(p.impactLevel.toLowerCase())}">
+                ${p.impactScore === null ? '&mdash;' : p.impactScore} ${esc(p.impactLevel)}
               </span>
             </td>
           `).join('')}
@@ -525,7 +536,7 @@ function openCompareModal() {
         </tr>
         <tr>
           <th>Status</th>
-          ${selectedProjects.map(p => `<td><span class="status-pill ${p.statusClass}">${p.status}</span></td>`).join('')}
+          ${selectedProjects.map(p => `<td><span class="status-pill ${esc(p.statusClass)}">${esc(p.status)}</span></td>`).join('')}
         </tr>
       </tbody>
     </table>
@@ -547,19 +558,19 @@ function openProjectModal(id) {
 
   container.innerHTML = `
     <div style="display: flex; gap: 24px; margin-bottom: 24px;">
-      <img src="${p.img}" style="width: 280px; height: 180px; border-radius: 12px; object-fit: cover;" alt="${p.title}" />
+      <img src="${esc(p.img)}" style="width: 280px; height: 180px; border-radius: 12px; object-fit: cover;" alt="${esc(p.title)}" />
       <div>
         <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-          <span class="tag-pill ${p.categoryClass}">${p.category}</span>
-          <span class="status-pill ${p.statusClass}">${p.status}</span>
+          <span class="tag-pill ${esc(p.categoryClass)}">${esc(p.category)}</span>
+          <span class="status-pill ${esc(p.statusClass)}">${esc(p.status)}</span>
         </div>
-        <h2 style="font-size: 24px; font-weight: 800; color: var(--navy-900); margin-bottom: 8px;">${p.title}</h2>
-        <p style="font-size: 14px; color: var(--gray-600); line-height: 1.5; margin-bottom: 16px;">${p.desc}</p>
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--navy-900); margin-bottom: 8px;">${esc(p.title)}</h2>
+        <p style="font-size: 14px; color: var(--gray-600); line-height: 1.5; margin-bottom: 16px;">${esc(p.desc)}</p>
         
         <div style="display: flex; gap: 20px; font-size: 13px; font-weight: 600; color: var(--gray-700);">
-          <div>📍 ${p.location}</div>
-          <div>💰 ${p.budget}</div>
-          <div>📅 ${p.duration}</div>
+          <div>📍 ${esc(p.location)}</div>
+          <div>💰 ${esc(p.budget)}</div>
+          <div>📅 ${esc(p.duration)}</div>
         </div>
       </div>
     </div>

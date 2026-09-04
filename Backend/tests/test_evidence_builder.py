@@ -3,7 +3,6 @@
 import asyncio
 
 import config
-import pytest
 
 from engine import evidence_builder as eb
 from retrieval import tavily_search as ts

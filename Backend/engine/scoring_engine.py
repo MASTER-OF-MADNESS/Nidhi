@@ -28,7 +28,6 @@ from models.schemas import (
     NGORecord,
     ProjectScore,
 )
-from retrieval.text_utils import canonical_category
 
 # (score, confidence, reasons, unknown_inputs)
 DimensionResult = tuple[float, float, list[str], list[str]]

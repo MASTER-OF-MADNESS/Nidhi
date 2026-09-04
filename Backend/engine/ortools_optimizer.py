@@ -54,7 +54,7 @@ class ConstraintSet:
 
     def describe_dropped(self, other: "ConstraintSet") -> list[str]:
         labels = {
-            "exact_count": f"exact project count",
+            "exact_count": "exact project count",
             "region_cap": f"{config.REGION_CAP:.0%} per-region concentration cap",
             "sector_cap": f"{config.SECTOR_CAP:.0%} per-sector concentration cap",
             "category_floors": (
@@ -485,13 +485,30 @@ def optimize(
 
     chosen = set(solution.allocations)
     is_greedy = solution.status == "GREEDY"
-    excluded = [
-        _explain_exclusion(
-            scores[i], request,
-            None if is_greedy
-            else _blocking_constraint(scores, request, applied, i))
-        for i in range(len(scores)) if i not in chosen
-    ]
+
+    # Diagnosing which constraint blocked a project costs one CP-SAT solve per
+    # relaxation rung, so it is only worth doing for projects that could
+    # otherwise have been funded. A project below the score threshold already
+    # has its answer, and probing the model for it would be pure waste --
+    # at 64 candidates that was several seconds of solving nobody reads.
+    # Diagnosis is bounded twice over: to the near-misses (a project below the
+    # score threshold already has its answer), and to the highest-scoring few
+    # of those. The reader wants to know why their best option missed out, not
+    # why the fortieth did, and an unbounded loop here is quadratic in solves.
+    candidates_for_diagnosis = sorted(
+        (i for i in range(len(scores))
+         if i not in chosen and scores[i].final_score >= config.THRESHOLD_REJECT),
+        key=lambda i: -scores[i].final_score,
+    )[:config.MAX_EXCLUSIONS_DIAGNOSED]
+    diagnose = set() if is_greedy else set(candidates_for_diagnosis)
+
+    excluded = []
+    for i in range(len(scores)):
+        if i in chosen:
+            continue
+        blocking = (_blocking_constraint(scores, request, applied, i)
+                    if i in diagnose else None)
+        excluded.append(_explain_exclusion(scores[i], request, blocking))
 
     checks = _constraint_checks(scores, solution.allocations, request)
     total = sum(solution.allocations.values())

@@ -206,10 +206,6 @@ async def _generate_gemini_stream(prompt: str) -> AsyncIterator[str]:
 # answered so the run can tell the user where its prose came from.
 # ---------------------------------------------------------------------------
 
-#: Provider that answered the most recent successful call, or None.
-last_provider: str | None = None
-
-
 def _enabled_providers() -> list[str]:
     from engine import xai_client
     checks = {"gemini": lambda: bool(config.GEMINI_API_KEY),
@@ -218,9 +214,17 @@ def _enabled_providers() -> list[str]:
             if name in checks and checks[name]()]
 
 
-async def _generate(prompt: str, *, json_schema: dict | None = None) -> str | None:
-    """Try each configured provider in order; None when all of them fail."""
-    global last_provider
+async def _generate(
+    prompt: str, *, json_schema: dict | None = None
+) -> tuple[str | None, str | None]:
+    """
+    Try each configured provider in order.
+
+    Returns (text, provider_name); (None, None) when every provider fails.
+    The provider is returned rather than stored on the module: two concurrent
+    /generate requests would otherwise overwrite each other's attribution and
+    the audit trail would name the wrong model.
+    """
     from engine import xai_client
 
     for provider in _enabled_providers():
@@ -232,18 +236,23 @@ async def _generate(prompt: str, *, json_schema: dict | None = None) -> str | No
         else:
             continue
         if text:
-            last_provider = provider
-            return text
-    last_provider = None
-    return None
+            return text, provider
+    return None, None
 
 
-async def _generate_stream(prompt: str) -> AsyncIterator[str]:
-    """Stream from the first provider that produces anything."""
-    global last_provider
+async def _generate_stream(
+    prompt: str, provider_out: list[str] | None = None
+) -> AsyncIterator[str]:
+    """
+    Stream from the first provider that produces anything.
+
+    An async generator cannot return a value, so the provider that answered is
+    appended to `provider_out` when one is supplied.
+    """
     from engine import xai_client
 
-    for provider in _enabled_providers():
+    providers = _enabled_providers()
+    for index, provider in enumerate(providers):
         produced = False
         source = (_generate_gemini_stream(prompt) if provider == "gemini"
                   else xai_client.generate_stream(prompt))
@@ -251,11 +260,11 @@ async def _generate_stream(prompt: str) -> AsyncIterator[str]:
             produced = True
             yield chunk
         if produced:
-            last_provider = provider
+            if provider_out is not None:
+                provider_out.append(provider)
             return
-        if provider != _enabled_providers()[-1]:
+        if index < len(providers) - 1:
             log.info("Provider %s produced nothing; trying the next.", provider)
-    last_provider = None
 
 
 def provider_status() -> dict[str, bool]:
@@ -445,7 +454,7 @@ async def extract_candidates(
         + "\n\nReturn JSON matching the required schema."
     )
 
-    text = await _generate(prompt, json_schema=CANDIDATE_SCHEMA)
+    text, provider = await _generate(prompt, json_schema=CANDIDATE_SCHEMA)
     payload = _extract_json(text) if text else None
     raw_projects = (payload or {}).get("projects") or []
 
@@ -453,7 +462,7 @@ async def extract_candidates(
     for index, raw in enumerate(raw_projects):
         if isinstance(raw, dict) and (c := _coerce_candidate(raw, index, pack, request)):
             # Record the provider so the user can tell Grok output from Gemini.
-            c.extraction_method = last_provider or "gemini"
+            c.extraction_method = provider or "gemini"
             candidates.append(c)
         if len(candidates) >= config.MAX_CANDIDATE_PROJECTS:
             break
@@ -468,10 +477,10 @@ async def extract_candidates(
             f"{names} unavailable or unusable; candidates derived by "
             f"rule-based extraction instead.")
         candidates = rule_based_candidates(pack, request)
-    elif last_provider and last_provider != "gemini":
+    elif provider and provider != "gemini":
         warnings.append(
             f"Gemini was unavailable; candidates were extracted by "
-            f"{last_provider} ({config.XAI_MODEL}) instead.")
+            f"{provider} ({config.XAI_MODEL}) instead.")
 
     if candidates and len(candidates) < len(raw_projects):
         warnings.append(
@@ -481,10 +490,11 @@ async def extract_candidates(
     return candidates, warnings
 
 
-async def stream_text(prompt: str, fallback: str) -> AsyncIterator[str]:
-    """Stream a narrative section, emitting `fallback` if the model is silent."""
+async def stream_text(prompt: str, fallback: str,
+                      provider_out: list[str] | None = None) -> AsyncIterator[str]:
+    """Stream a narrative section, emitting `fallback` if every provider is silent."""
     produced = False
-    async for chunk in _generate_stream(prompt):
+    async for chunk in _generate_stream(prompt, provider_out):
         produced = True
         yield chunk
     if not produced:
@@ -495,7 +505,7 @@ async def health_check() -> tuple[bool, str]:
     """Cheap liveness probe for GET /health."""
     if not config.GEMINI_API_KEY:
         return False, "GEMINI_API_KEY not configured"
-    text = await _generate("Reply with the single word: ok")
+    text, _ = await _generate("Reply with the single word: ok")
     if text is None:
         return False, f"no response from {config.GEMINI_MODEL}"
     return True, "ok"
@@ -521,7 +531,7 @@ async def explain_projects(
     if not items:
         return {}, warnings
 
-    text = await _generate(
+    text, provider = await _generate(
         explainer.batch_projects_prompt(items, request),
         json_schema=explainer.BATCH_SCHEMA,
     )
@@ -545,7 +555,7 @@ async def explain_projects(
         ) or "no model provider"
         warnings.append(
             f"{names} unavailable; using rule-based text for every project.")
-    elif last_provider and last_provider != "gemini":
+    elif provider and provider != "gemini":
         warnings.append(
             f"Explanations were written by Grok ({config.XAI_MODEL}); "
             f"Gemini was unavailable.")
