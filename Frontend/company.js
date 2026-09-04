@@ -73,12 +73,22 @@ async function loadCompanyData(companyId) {
     // user runs one, point them at the wizard instead of showing stale cards.
     state.recommendations = [];
 
+    const banner = document.getElementById('ws-load-error');
+    if (banner) banner.style.display = 'none';
     updateOverviewKpis(profile);
     if (typeof renderProjectsGrid === 'function') renderProjectsGrid();
     if (typeof renderRecommendations === 'function') renderRecommendations();
     if (typeof renderSavedProjectsTable === 'function') renderSavedProjectsTable();
   } catch (err) {
+    // Failing silently here leaves the dashboard showing whatever markup was
+    // already on screen, which a user reasonably reads as real figures.
     console.warn('NIDHI: could not load company data —', err.message);
+    showLoadError(
+      err.message === 'Failed to fetch'
+        ? 'Cannot reach the NIDHI backend, so no company data is shown. ' +
+          'Start it with: uvicorn main:app --port 8000'
+        : `Could not load company data: ${err.message}`);
+    ['0', '1', '2', '3'].forEach((_, i) => setKpi(i, '—'));
   }
 
   try {
@@ -87,6 +97,14 @@ async function loadCompanyData(companyId) {
     updateHistoryKpi(runs);
   } catch { /* history is optional context */ }
 }
+
+function showLoadError(message) {
+  const banner = document.getElementById('ws-load-error');
+  if (!banner) return;
+  banner.textContent = message;
+  banner.style.display = 'block';
+}
+
 
 function setKpi(index, value, label) {
   const cards = document.querySelectorAll('#ws-overview .kpi-card');
